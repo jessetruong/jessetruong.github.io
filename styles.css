@@ -1,0 +1,52 @@
+body{
+    background-color: black;
+}
+
+
+.preview-image {
+    width: 300px;
+    margin: 5px;
+}
+
+.preview-image:focus {
+    animation: focusImage .5s;
+    width:calc(300px * 1.2);
+}
+
+@keyframes focusImage {
+    from {
+        width: 300px;
+    }
+    to {
+        width:calc(300px * 1.2);
+    }
+}
+
+@keyframes unfocusImage {
+    from {
+      width: 300px;
+    }
+    to {
+        width:calc(300px * 1.2);
+    }
+}
+
+.set-container {
+    padding: 15px;
+    overflow-x: auto;
+}
+
+.set-container > label {
+    color: white;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 1.5em;
+    margin:10px;
+}
+
+.set-images-container {
+    overflow-x: auto;
+}
+
+.set-images {
+    width: max-content;
+}
