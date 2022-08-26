@@ -28,53 +28,78 @@ function handleWindowResize() {
 }
 
 function handleKeyNavigation(e) {
-    let scrollWidth = 0;
     switch (e.keyCode) {
         case 37:
             console.log('left')
+            cleanCurrentSelection();
             focusedImage--;
-            scrollWidth = -320;
+            navigateToNewSelection();
             break;
         case 38:
             console.log('up')
+            cleanCurrentSelection();
             focusedSet--;
+            navigateToNewSelection();
             break;
         case 39:
             console.log('right')
-            focusedImage++;
-            if (focusedImage >= 5) {
-                scrollWidth = 320;
-            }
-            
+            cleanCurrentSelection();
+            focusedImage++;  
+            navigateToNewSelection();      
             break;
         case 40:
             console.log('down')
+            cleanCurrentSelection();
             focusedSet++;
+            navigateToNewSelection();
             break;
         default:
             break;
     }
+}
 
+function cleanCurrentSelection() {
+    if (focusedSet >= 0 && focusedImage >= 0) {
+        const setImagesContainer = document.getElementById(`set_${focusedSet}_container`);        
+        setImagesContainer.querySelector('.left-arrow').style.display = 'none';
+        setImagesContainer.querySelector('.right-arrow').style.display = 'none';
+    }
+}
+
+function navigateToNewSelection() {
+
+    let scrollWidth = 0;
     focusedSet = Math.min(Math.max(0, focusedSet), 3);
 
-    console.log(focusedSet, focusedImage)
-    const setContainerImages = document.getElementById(`set_${focusedSet}_container`).childNodes;
-    // if(focusedImage > imagesPerPage) {
-        setContainerImages.forEach(image => {
-            focusedImage = Math.min(Math.max(0, focusedImage), image.children.length - 1);
-            console.log(image.children.length)
-            image.addEventListener('animationend', () => {
+    const setImagesContainer = document.getElementById(`set_${focusedSet}_container`);
+    const images = document.getElementById(`set_${focusedSet}_container`).querySelector('.set-images');
+
+    focusedImage = Math.min(Math.max(0, focusedImage), images.children.length - 1);
+    
+    if(focusedImage > imagesPerPage - 1) {
+        setImagesContainer.querySelector('.left-arrow').style.display = 'block';
+    } else {
+        setImagesContainer.querySelector('.left-arrow').style.display = 'none';
+    }
+    if(focusedImage < images.children.length - 1) {
+        setImagesContainer.querySelector('.right-arrow').style.display = 'block';
+    } else {
+        setImagesContainer.querySelector('.right-arrow').style.display = 'none';
+    }
+        // setContainerImages.forEach(image => {
+            
+            console.log(images.children.length)
+            images.addEventListener('animationend', () => {
                 console.log('Animation end');
-                image.classList.add('scrolled');
-                image.classList.remove('scroll-image')
+                images.classList.add('scrolled');
+                images.classList.remove('scroll-image')
             });
-            const currentScrollWidth = parseInt(getComputedStyle(image).getPropertyValue('--scroll-width'), 10) || 0;
-            image.style.setProperty('--current-scroll-position',  currentScrollWidth + 'px')
+            const currentScrollWidth = parseInt(getComputedStyle(images).getPropertyValue('--scroll-width'), 10) || 0;
+            images.style.setProperty('--current-scroll-position',  currentScrollWidth + 'px')
             scrollWidth = Math.max(focusedImage - imagesPerPage + 1, 0) * 320
-            image.style.setProperty('--scroll-width',  -scrollWidth + 'px')
-            image.classList.add('scroll-image');
-        })
-    // }
+            images.style.setProperty('--scroll-width',  -scrollWidth + 'px')
+            images.classList.add('scroll-image');
+        // })
     
     document.getElementById(`set_${focusedSet}_image_${focusedImage}`).focus();
 }
@@ -88,7 +113,7 @@ http.onreadystatechange = (e) => {
             responseJSON.data.StandardCollection.containers.forEach((container, index) => {
                 if (container.set?.items) {
                     let setContainer = createSetContainer(container.set.text.title.full.set.default.content, index);
-                    setContainer.appendChild(createSetOptionImagesSection(container.set?.items, setContainer.getAttribute('id')));
+                    setContainer.appendChild(createSetOptionImagesSection(container.set?.items, /(set_)(\d*)/.exec(setContainer.getAttribute('id'))[2]));
                     contentSection.appendChild(setContainer);
                 }
                 
@@ -109,10 +134,34 @@ const createSetContainer = (setName, index) => {
     return newSet
 }
 
-const createSetOptionImagesSection = (items, setID) => {
+function createLeftArrow(distanceFromTop) {
+    const leftArrow = document.createElement('div');
+    leftArrow.classList.add('page-arrow', 'left-arrow');
+    leftArrow.style.setProperty('--distance-from-top', distanceFromTop + 'px');
+    leftArrow.style.display = 'none';
+    leftArrow.appendChild(document.createTextNode('\u276E'));
+    return leftArrow;
+}
+
+function createRightArrow(distanceFromTop) {
+    const rightArrow = document.createElement('div');
+    rightArrow.classList.add('page-arrow', 'right-arrow');
+    rightArrow.style.setProperty('--distance-from-top', distanceFromTop + 'px');
+    rightArrow.style.display = 'none';
+    rightArrow.appendChild(document.createTextNode('\u276F'));
+    return rightArrow;
+}
+
+
+const createSetOptionImagesSection = (items, setIndex) => {
     const setImagesContainer = document.createElement('div');
     setImagesContainer.classList.add('set-images-container');
-    setImagesContainer.setAttribute('id', `${setID}_container`);
+    setImagesContainer.setAttribute('id', `set_${setIndex}_container`);
+
+    
+    setImagesContainer.appendChild(createLeftArrow(110 + 260 * setIndex));
+    setImagesContainer.appendChild(createRightArrow(110 + 260 * setIndex));
+    
     const setOptions = document.createElement('div');
     setOptions.classList.add('set-images')
     setImagesContainer.appendChild(setOptions);
@@ -130,7 +179,7 @@ const createSetOptionImagesSection = (items, setID) => {
                     if (exists) {
                         const img = document.createElement('input');
                         img.setAttribute('type', 'image');
-                        img.setAttribute('id', `${setID}_image_${index}`)
+                        img.setAttribute('id', `set_${setIndex}_image_${index}`)
                         img.classList.add('preview-image');
                         img.src = itemImageURL
                         setOptions.appendChild(img);

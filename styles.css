@@ -2,6 +2,22 @@ body{
     background-color: black;
 }
 
+.page-arrow {
+    position: absolute;
+    top: var(--distance-from-top);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 80px;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.left-arrow {
+}
+
+.right-arrow {
+    right: 0px;
+}
+
 
 .preview-image {
     width: 300px;
