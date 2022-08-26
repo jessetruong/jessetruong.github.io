@@ -13,12 +13,18 @@ let imagesPerPage;
 window.addEventListener('resize', handleWindowResize)
 window.onload = handleWindowOnLoad;
 
+// Disable mouse navigation
+window.onmousedown = function(e) {
+    e.preventDefault();
+}
+
 function handleWindowOnLoad() {
     handleWindowResize();
 }
 
 function handleWindowResize() {
-    console.log('Window resize');
+    imagesPerPage = Math.floor(window.innerWidth/320);
+    console.log('Window resize', window.innerWidth, imagesPerPage);
 }
 
 function handleKeyNavigation(e) {
@@ -50,21 +56,26 @@ function handleKeyNavigation(e) {
     }
 
     focusedSet = Math.min(Math.max(0, focusedSet), 3);
-    focusedImage = Math.min(Math.max(0, focusedImage), 14);
 
     console.log(focusedSet, focusedImage)
     const setContainerImages = document.getElementById(`set_${focusedSet}_container`).childNodes;
-    // setContainerImages.forEach(image => {
-    //     image.addEventListener('animationend', () => {
-    //         console.log('Animation end');
-    //         image.classList.add('scrolled');
-    //         image.classList.remove('scroll-image')
-    //     });
-    //     const currentScrollWidth = parseInt(getComputedStyle(image).getPropertyValue('--scroll-width'), 10) || 0;
-    //     image.style.setProperty('--scroll-width',  currentScrollWidth-scrollWidth + 'px')
-    //     image.classList.add('scroll-image');
-    // })
-    setContainerImages.scrollLeft += scrollWidth;
+    // if(focusedImage > imagesPerPage) {
+        setContainerImages.forEach(image => {
+            focusedImage = Math.min(Math.max(0, focusedImage), image.children.length - 1);
+            console.log(image.children.length)
+            image.addEventListener('animationend', () => {
+                console.log('Animation end');
+                image.classList.add('scrolled');
+                image.classList.remove('scroll-image')
+            });
+            const currentScrollWidth = parseInt(getComputedStyle(image).getPropertyValue('--scroll-width'), 10) || 0;
+            image.style.setProperty('--current-scroll-position',  currentScrollWidth + 'px')
+            scrollWidth = Math.max(focusedImage - imagesPerPage + 1, 0) * 320
+            image.style.setProperty('--scroll-width',  -scrollWidth + 'px')
+            image.classList.add('scroll-image');
+        })
+    // }
+    
     document.getElementById(`set_${focusedSet}_image_${focusedImage}`).focus();
 }
 

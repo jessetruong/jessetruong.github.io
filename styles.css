@@ -60,11 +60,11 @@ body{
 
 @keyframes scrollElement {
     from {
-        transform: translateX(0px);
+        transform: translateX(var(--current-scroll-position));
       }
-      to {
+    to {
         transform: translateX(var(--scroll-width));
-      }
+    }
 }
 
 .set-images {
