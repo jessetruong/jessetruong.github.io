@@ -8,11 +8,26 @@ document.onkeydown = handleKeyNavigation;
 let focusedSet = -1;
 let focusedImage = -1;
 
+let imagesPerPage;
+
+window.addEventListener('resize', handleWindowResize)
+window.onload = handleWindowOnLoad;
+
+function handleWindowOnLoad() {
+    handleWindowResize();
+}
+
+function handleWindowResize() {
+    console.log('Window resize');
+}
+
 function handleKeyNavigation(e) {
+    let scrollWidth = 0;
     switch (e.keyCode) {
         case 37:
             console.log('left')
             focusedImage--;
+            scrollWidth = -320;
             break;
         case 38:
             console.log('up')
@@ -21,6 +36,10 @@ function handleKeyNavigation(e) {
         case 39:
             console.log('right')
             focusedImage++;
+            if (focusedImage >= 5) {
+                scrollWidth = 320;
+            }
+            
             break;
         case 40:
             console.log('down')
@@ -34,6 +53,18 @@ function handleKeyNavigation(e) {
     focusedImage = Math.min(Math.max(0, focusedImage), 14);
 
     console.log(focusedSet, focusedImage)
+    const setContainerImages = document.getElementById(`set_${focusedSet}_container`).childNodes;
+    // setContainerImages.forEach(image => {
+    //     image.addEventListener('animationend', () => {
+    //         console.log('Animation end');
+    //         image.classList.add('scrolled');
+    //         image.classList.remove('scroll-image')
+    //     });
+    //     const currentScrollWidth = parseInt(getComputedStyle(image).getPropertyValue('--scroll-width'), 10) || 0;
+    //     image.style.setProperty('--scroll-width',  currentScrollWidth-scrollWidth + 'px')
+    //     image.classList.add('scroll-image');
+    // })
+    setContainerImages.scrollLeft += scrollWidth;
     document.getElementById(`set_${focusedSet}_image_${focusedImage}`).focus();
 }
 
@@ -61,7 +92,7 @@ const createSetContainer = (setName, index) => {
     newSet.setAttribute('id', `set_${index}`)
     newSet.classList.add('set-container');
     const label = document.createElement('label');
-    label.setAttribute("for",setName);
+    label.setAttribute('for',setName);
     label.innerHTML = setName;
     newSet.appendChild(label);
     return newSet
@@ -70,6 +101,7 @@ const createSetContainer = (setName, index) => {
 const createSetOptionImagesSection = (items, setID) => {
     const setImagesContainer = document.createElement('div');
     setImagesContainer.classList.add('set-images-container');
+    setImagesContainer.setAttribute('id', `${setID}_container`);
     const setOptions = document.createElement('div');
     setOptions.classList.add('set-images')
     setImagesContainer.appendChild(setOptions);

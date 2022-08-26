@@ -5,35 +5,36 @@ body{
 
 .preview-image {
     width: 300px;
-    margin: 5px;
+    margin: 10px 5px;
+    padding: 5px;
 }
 
 .preview-image:focus {
     animation: focusImage .5s;
-    width:calc(300px * 1.2);
+    transform: scale(1.2);
+    outline: none;
 }
 
 @keyframes focusImage {
     from {
-        width: 300px;
-    }
-    to {
-        width:calc(300px * 1.2);
-    }
+        transform: scale(1);
+      }
+      to {
+          transform: scale(1.2);
+      }
 }
 
 @keyframes unfocusImage {
     from {
-      width: 300px;
+      transform: scale(1);
     }
     to {
-        width:calc(300px * 1.2);
+        transform: scale(1.1);
     }
 }
 
 .set-container {
     padding: 15px;
-    overflow-x: auto;
 }
 
 .set-container > label {
@@ -44,7 +45,26 @@ body{
 }
 
 .set-images-container {
-    overflow-x: auto;
+    overflow-x: hidden;
+}
+
+.scroll-image {
+    animation: scrollElement .5s;
+    transform: translateX(var(--scroll-width));
+}
+
+.scrolled {
+    transform: translateX(var(--scroll-width));
+}
+
+
+@keyframes scrollElement {
+    from {
+        transform: translateX(0px);
+      }
+      to {
+        transform: translateX(var(--scroll-width));
+      }
 }
 
 .set-images {
