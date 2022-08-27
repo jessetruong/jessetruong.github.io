@@ -61,27 +61,39 @@ function handleKeyNavigation(e) {
 
 
 function cleanCurrentSelection() {
-    if (focusedSet >= 0 && focusedImage >= 0) {
+    if (focusedSet >= 0) {
         const setImagesContainer = document.getElementById(`set_${focusedSet}_container`);        
         setImagesContainer.querySelector('.left-arrow').style.display = 'none';
         setImagesContainer.querySelector('.right-arrow').style.display = 'none';
     }
 }
 
+
 function focusOnNewSelection(horizonalIncrement, verticalIncrement) {
     const numTotalSets = document.querySelectorAll('.set-container').length; 
-    const contentSection = document.querySelector('#content-selector');
     if (focusedSet < 0) {
-        contentSection.prepend(contentSection.lastChild);
         focusedSet = numTotalSets - 1;
     } else if (focusedSet >= numTotalSets) {
-        contentSection.append(contentSection.firstChild);
         focusedSet = 0;
     }
 
     const setImagesContainer = document.getElementById(`set_${focusedSet}_container`);
-    setImagesContainer.querySelector('.left-arrow').style.display = 'block';
-    setImagesContainer.querySelector('.right-arrow').style.display = 'block';
+    const leftArrow = setImagesContainer.querySelector('.left-arrow');
+    leftArrow.style.display = 'block';
+    const rightArrow = setImagesContainer.querySelector('.right-arrow');
+    rightArrow.style.display = 'block';
+
+    if (horizonalIncrement === 1) {
+        rightArrow.animate([{backgroundColor: '#434343',transform: 'scale(1)'}, {backgroundColor: '#434343', transform:  'scale(1.2)'}], {
+            duration: 200,
+            iterations: 1,
+          });
+    } else if (horizonalIncrement ===  -1) {
+        leftArrow.animate([{backgroundColor: '#434343',transform: 'scale(1)'}, {backgroundColor: '#434343', transform:  'scale(1.2)'}], {
+            duration: 200,
+            iterations: 1,
+          });
+    }
 
     const setImages = document.getElementById(`set_${focusedSet}_container`).querySelector('.set-images');
     
