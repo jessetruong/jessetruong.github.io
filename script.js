@@ -83,65 +83,68 @@ function focusOnNewSelection(horizonalIncrement, verticalIncrement) {
     setImagesContainer.querySelector('.left-arrow').style.display = 'block';
     setImagesContainer.querySelector('.right-arrow').style.display = 'block';
 
-    const images = document.getElementById(`set_${focusedSet}_container`).querySelector('.set-images');
+    const setImages = document.getElementById(`set_${focusedSet}_container`).querySelector('.set-images');
     
     if (selectedImagePosition < 0 || selectedImagePosition >= Math.ceil(imagesPerPage/2)) {
         beginRowScrolling = true;
     }
 
-    // const index = Array.from(images.children).indexOf(document.getElementById(`set_${focusedSet}_image_${focusedImage}`) );
-    // if (!images.children[index + Math.ceil(imagesPerPage/2)]) {
-    //     images.prepend(createPlaceholderImage());
-    //     console.log('before', index + Math.ceil(imagesPerPage/2), images.children[index + Math.ceil(imagesPerPage/2)])
-    //     images.appendChild(images.querySelector('.preview-image'));
-    //     console.log('after', index + Math.ceil(imagesPerPage/2), images.children[index + Math.ceil(imagesPerPage/2)])
-    // }
 
     if (focusedImage < 0) {
-        focusedImage = images.querySelectorAll('.preview-image').length - 1;
-        // while (images.querySelectorAll('.preview-image')[selectedImagePosition].getAttribute('id') !== `set_${focusedSet}_image_${focusedImage}`) {
-        //     console.log(images.querySelectorAll('.preview-image')[selectedImagePosition].getAttribute('id'), `set_${focusedSet}_image_${focusedImage}`);
-        //     images.prepend(images.lastChild);
-        // }
-    } else if (focusedImage > images.querySelectorAll('.preview-image').length - 1) {
+        focusedImage = setImages.querySelectorAll('.preview-image').length - 1;
+    } else if (focusedImage > setImages.querySelectorAll('.preview-image').length - 1) {
         focusedImage = 0;
     }
+
+    let currentScrollPosition = parseInt(getComputedStyle(setImages).getPropertyValue('--scroll-distance'), 10) || 0;
     
-    if (beginRowScrolling) {
-        let currentScrollPosition = parseInt(getComputedStyle(images).getPropertyValue('--scroll-distance'), 10) || 0;
-        images.style.setProperty('--current-scroll-position',  currentScrollPosition + 'px');
+    if ((beginRowScrolling && horizonalIncrement !== 0) && !(selectedImagePosition <= Math.floor(imagesPerPage/2) && horizonalIncrement === 1)) {
+        
+        setImages.style.setProperty('--current-scroll-position',  currentScrollPosition + 'px');
         
         const scrollAnimationFinished = () => {
-            images.classList.add('scrolled');
-            images.classList.remove('scrolling-image');
-            images.removeEventListener('animationend', scrollAnimationFinished);
+            setImages.classList.add('scrolled');
+            setImages.classList.remove('scrolling-image');
+            setImages.removeEventListener('animationend', scrollAnimationFinished);
         }
-        images.addEventListener('animationend', scrollAnimationFinished);
+        setImages.addEventListener('animationend', scrollAnimationFinished);
         
 
         console.log('Selected image position', selectedImagePosition);
         scrollDistance = focusedImage <= Math.floor(imagesPerPage/2) ? 0 : (Math.floor(imagesPerPage/2) - focusedImage) * 320;
 
 
-        if (focusedImage === images.querySelectorAll('.preview-image').length - 2 && horizonalIncrement === -1) {
+        if (currentScrollPosition === -390) {
             currentScrollPosition = (Math.floor(imagesPerPage/2) - focusedImage - 1) * 320;
-            images.style.setProperty('--current-scroll-position',  currentScrollPosition + 'px');
+            setImages.style.setProperty('--current-scroll-position',  currentScrollPosition + 'px');
         }
 
         // Loop backward from the beginning to the end
-        if (selectedImagePosition < 0) {
+        if (focusedImage === setImages.querySelectorAll('.preview-image').length - 1 && horizonalIncrement === -1) {
             scrollDistance = -390;
         }
         
         console.log('Scroll distance', currentScrollPosition, (selectedImagePosition - imagesPerPage), scrollDistance);
-        images.style.setProperty('--scroll-distance',  scrollDistance + 'px');
-        images.classList.add('scrolling-image');
+        setImages.style.setProperty('--scroll-distance',  scrollDistance + 'px');
+        setImages.classList.add('scrolling-image');
 
         selectedImagePosition = focusedImage < Math.floor(imagesPerPage/2) && focusedImage >= 0 ?
             focusedImage : Math.floor(imagesPerPage/2);
         console.log('Selected image position', selectedImagePosition);
     }
-   
+
+    // Handle vertical navigation
+    if (verticalIncrement !== 0) {
+        let scrollOffset;
+        if (currentScrollPosition === -390) {
+            scrollOffset = setImages.querySelectorAll('.preview-image').length - 3;
+        } else {
+            scrollOffset = currentScrollPosition === 0 ? 0 : -currentScrollPosition / 320;
+        }
+        focusedImage = scrollOffset + selectedImagePosition;
+    }
+    
+
     
     document.getElementById(`set_${focusedSet}_image_${focusedImage}`).focus();
 }
