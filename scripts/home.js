@@ -1,4 +1,3 @@
-
 export const generateHomePage = () => {
     // Constants and global variables
     const url='https://cd-static.bamgrid.com/dp-117731241344/home.json';

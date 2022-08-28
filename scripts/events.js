@@ -1,5 +1,3 @@
-
-
 export const handleUserActions = () => {
 
     // Constants and global variables
