@@ -8,11 +8,11 @@ export const handleUserActions = () => {
 
     const arrowAnimationKeyFrames = [{
         backgroundColor: '#000000',
-        transform: 'scale(1)'
+        transform: 'scale(0.6)'
     }, 
     {
-        backgroundColor: '#434343', 
-        transform:  'scale(1.2)'
+        backgroundColor: '#00000080', 
+        transform:  'scale(1.1)'
     }];
 
     const arrowAnimationOptions = {
@@ -28,6 +28,8 @@ export const handleUserActions = () => {
 
     let imagesPerPage; // How many images can fit per row on screen
     
+    let keypressesDisabled = false;
+
     // Create event listeners and designate handlers
     window.addEventListener('resize', handleWindowResize);
     window.onload = handleWindowOnLoad;
@@ -51,41 +53,43 @@ export const handleUserActions = () => {
     }
 
     function handleKeyNavigation(e) {
-        let horizonalIncrement = 0;
-        let verticalIncrement = 0;
-        switch (e.keyCode) {
-            case 8: // Back
-                closeModal(e);
-                break;
-            case 13: // Enter
-                if (modalOpened) {
-                    closeModal(e)
-                } else {
-                    openModal();
-                }
-                break;
-            case 37: // Left
-                horizonalIncrement--;
-                break;
-            case 38: // Up
-                verticalIncrement--;
-                break;
-            case 39: // Right
-                horizonalIncrement++;   
-                break;
-            case 40: // Down
-                verticalIncrement++;
-                break;
-            default:
-                break;
-        }
-
-        if (!modalOpened && e.keyCode >= 37 && e.keyCode <= 40) {
-            cleanCurrentSelection();
-            selectedRow += verticalIncrement;
-            selectedImageIndex += horizonalIncrement;
-            selectedImagePagePosition += horizonalIncrement;
-            focusOnNewSelection(horizonalIncrement, verticalIncrement);
+        if (!keypressesDisabled) {
+            let horizonalIncrement = 0;
+            let verticalIncrement = 0;
+            switch (e.keyCode) {
+                case 8: // Back
+                    closeModal(e);
+                    break;
+                case 13: // Enter
+                    if (modalOpened) {
+                        closeModal(e)
+                    } else {
+                        openModal();
+                    }
+                    break;
+                case 37: // Left
+                    horizonalIncrement--;
+                    break;
+                case 38: // Up
+                    verticalIncrement--;
+                    break;
+                case 39: // Right
+                    horizonalIncrement++;   
+                    break;
+                case 40: // Down
+                    verticalIncrement++;
+                    break;
+                default:
+                    break;
+            }
+    
+            if (!modalOpened && e.keyCode >= 37 && e.keyCode <= 40) {
+                cleanCurrentSelection();
+                selectedRow += verticalIncrement;
+                selectedImageIndex += horizonalIncrement;
+                selectedImagePagePosition += horizonalIncrement;
+                focusOnNewSelection(horizonalIncrement, verticalIncrement);
+            }
         }
     }
 
@@ -203,11 +207,13 @@ export const handleUserActions = () => {
                 setImages.classList.add('scrolled');
                 setImages.classList.remove('scrolling-image');
                 setImages.removeEventListener('animationend', scrollAnimationFinished);
+                keypressesDisabled = false;
             }
             setImages.addEventListener('animationend', scrollAnimationFinished);
             
             setImages.style.setProperty('--scroll-distance',  scrollDistance + 'px');
             setImages.classList.add('scrolling-image');
+            keypressesDisabled = true;
 
             selectedImagePagePosition = selectedImageIndex < Math.floor(imagesPerPage/2) && selectedImageIndex >= 0 ?
                 selectedImageIndex : Math.floor(imagesPerPage/2);
