@@ -38,6 +38,9 @@ export const handleUserActions = () => {
         e.preventDefault();
     }
     
+    const infoModal = document.querySelector('#info-modal');
+    let modalOpened = false;
+
     // Event handler functions
     function handleWindowOnLoad() {
         handleWindowResize();
@@ -51,6 +54,16 @@ export const handleUserActions = () => {
         let horizonalIncrement = 0;
         let verticalIncrement = 0;
         switch (e.keyCode) {
+            case 8: // Back
+                closeModal(e);
+                break;
+            case 13: // Enter
+                if (modalOpened) {
+                    closeModal(e)
+                } else {
+                    openModal();
+                }
+                break;
             case 37: // Left
                 horizonalIncrement--;
                 break;
@@ -67,13 +80,38 @@ export const handleUserActions = () => {
                 break;
         }
 
-        if (e.keyCode >= 37 && e.keyCode <= 40) {
+        if (!modalOpened && e.keyCode >= 37 && e.keyCode <= 40) {
             cleanCurrentSelection();
             selectedRow += verticalIncrement;
             selectedImageIndex += horizonalIncrement;
             selectedImagePagePosition += horizonalIncrement;
             focusOnNewSelection(horizonalIncrement, verticalIncrement);
         }
+    }
+
+    async function openModal() {
+        const selectedImage = document.getElementById(`set_${selectedRow}_image_${selectedImageIndex}`);
+        if (selectedImage) {
+            const selectedImageData = selectedImage.dataset;
+            if (selectedImageData.videoUrl) {
+                infoModal.querySelector('#preview-video').src = selectedImageData.videoUrl;
+            }
+            infoModal.querySelector('h1').textContent = selectedImageData.title;
+            infoModal.querySelector('p').textContent = selectedImageData.id;
+        }
+    
+        modalOpened = true;
+        infoModal.classList.add('open');
+        const exits = infoModal.querySelectorAll('.modal-exit');
+        exits.forEach(function (exit) {
+            exit.addEventListener('click', closeModal);
+        });
+    }
+
+    function closeModal(event) {
+        event.preventDefault();
+        infoModal.classList.remove('open');
+        modalOpened = false;
     }
 
     

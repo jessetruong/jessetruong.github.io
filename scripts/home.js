@@ -90,9 +90,21 @@ export const generateHomePage = () => {
                 const tile = item?.image.tile['1.78'];
 
                 // There has to be a better way to do this
-                const itemImageURL = tile?.series?.default?.url ||
-                    tile?.program?.default?.url ||
-                    tile?.default?.default?.url
+                let contentType = 'default';
+                let id = item.contentId;
+                if (item.collectionId) {
+                    id = item.collectionId;
+                    contentType = 'collection';
+                } else if (item.programId) {
+                    id = item.programId;
+                    contentType = 'program';
+                } else if (item.seriesId) {
+                    id = item.seriesId;
+                    contentType = 'series';
+                }
+
+                const itemImageURL = tile.default?.default?.url || tile[contentType].default?.url;
+
                 if (itemImageURL) {
                     checkIfImageExists(itemImageURL, (exists) => {
                         if (exists) {
@@ -101,6 +113,9 @@ export const generateHomePage = () => {
                             img.setAttribute('id', `set_${setIndex}_image_${index}`)
                             img.setAttribute('data-set', setIndex);
                             img.setAttribute('data-image-index', index);
+                            img.setAttribute('data-title', item.text?.title?.full[contentType]?.default?.content);
+                            img.setAttribute('data-id', id);
+                            img.setAttribute('data-video-url', item.videoArt[0]?.mediaMetadata?.urls[0]?.url);
                             img.classList.add('preview-image');
                             img.src = itemImageURL
                             loopBackImage.before(img);
