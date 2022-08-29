@@ -28,7 +28,7 @@ export const generateHomePage = () => {
             } 
     }
 
-    const createSetContainer = (setData, index) => {
+    function createSetContainer(setData, index) {
         const setName = setData.text.title.full.set.default.content;
         const setContainer = document.createElement('div');
         setContainer.setAttribute('id', `set_${index}`)
@@ -67,7 +67,7 @@ export const generateHomePage = () => {
         return img;
     }
 
-    const createSetOptionImagesSection = (items, setIndex) => {
+    function createSetOptionImagesSection(items, setIndex) {
         const setImagesContainer = document.createElement('div');
         setImagesContainer.classList.add('set-images-container');
         setImagesContainer.setAttribute('id', `set_${setIndex}_container`);
@@ -107,16 +107,7 @@ export const generateHomePage = () => {
                 if (itemImageURL) {
                     checkIfImageExists(itemImageURL, (exists) => {
                         if (exists) {
-                            const img = document.createElement('input');
-                            img.setAttribute('type', 'image');
-                            img.setAttribute('id', `set_${setIndex}_image_${index}`)
-                            img.setAttribute('data-set', setIndex);
-                            img.setAttribute('data-image-index', index);
-                            img.setAttribute('data-title', item.text?.title?.full[contentType]?.default?.content);
-                            img.setAttribute('data-id', id);
-                            img.setAttribute('data-video-url', item.videoArt[0]?.mediaMetadata?.urls[0]?.url);
-                            img.classList.add('preview-image');
-                            img.src = itemImageURL
+                            const img = createPreviewImageElement(item, contentType, id, setIndex, index, itemImageURL);
                             loopBackImage.before(img);
                             index++;
                         } else {
@@ -127,6 +118,20 @@ export const generateHomePage = () => {
             });
         }
         return setImagesContainer;
+    }
+
+    function createPreviewImageElement(item, contentType, id, setIndex, index, itemImageURL) {
+        const img = document.createElement('input');
+        img.setAttribute('type', 'image');
+        img.setAttribute('id', `set_${setIndex}_image_${index}`)
+        img.setAttribute('data-set', setIndex);
+        img.setAttribute('data-image-index', index);
+        img.setAttribute('data-title', item.text?.title?.full[contentType]?.default?.content);
+        img.setAttribute('data-id', id);
+        img.setAttribute('data-video-url', item.videoArt[0]?.mediaMetadata?.urls[0]?.url);
+        img.classList.add('preview-image');
+        img.src = itemImageURL;
+        return img;
     }
 
     // Helper function to determine if provided image URL is valid

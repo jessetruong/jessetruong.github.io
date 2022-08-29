@@ -91,7 +91,7 @@ export const handleUserActions = () => {
         }
     }
 
-    async function openModal() {
+    function openModal() {
         const selectedImage = document.getElementById(`set_${selectedRow}_image_${selectedImageIndex}`);
         if (selectedImage) {
             const selectedImageData = selectedImage.dataset;
